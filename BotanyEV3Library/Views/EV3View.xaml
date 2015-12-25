@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="BotanyEV3Library.Views.EV3View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BotanyEV3Library.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <Grid>
+        <Button x:Name="InitializeButton" Command="{Binding InitializeCommand}" Content="Initialize" HorizontalAlignment="Left" Margin="18,71,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="ExecuteButton" Command="{Binding ExecuteCommand}" Content="Execute" HorizontalAlignment="Left" Margin="118,71,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="StopButton" Command="{Binding StopCommand}" Content="Stop" HorizontalAlignment="Left" Margin="230,71,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="ResetButton" Command="{Binding ResetCommand}" Content="Reset" HorizontalAlignment="Left" Margin="337,71,0,0" VerticalAlignment="Top" Width="75"/>
+    </Grid>
+</UserControl>
