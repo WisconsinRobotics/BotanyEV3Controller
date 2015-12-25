@@ -63,5 +63,23 @@ namespace BotanyEV3Library.ViewModels
         {
             ev3Model.Stop();
         }
+
+        public int Iterations
+        {
+            get { return ev3Model.Iterations; }
+            set { ev3Model.Iterations = value; }
+        }
+
+        public int MotorSpeed
+        {
+            get { return ev3Model.MotorSpeed; }
+            set { ev3Model.MotorSpeed = value; }
+        }
+
+        public bool TestRun
+        {
+            get { return ev3Model.TestRun; }
+            set { ev3Model.TestRun = value; }
+        }
     }
 }

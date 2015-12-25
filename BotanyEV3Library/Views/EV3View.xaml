@@ -11,5 +11,10 @@
         <Button x:Name="ExecuteButton" Command="{Binding ExecuteCommand}" Content="Execute" HorizontalAlignment="Left" Margin="118,71,0,0" VerticalAlignment="Top" Width="75"/>
         <Button x:Name="StopButton" Command="{Binding StopCommand}" Content="Stop" HorizontalAlignment="Left" Margin="230,71,0,0" VerticalAlignment="Top" Width="75"/>
         <Button x:Name="ResetButton" Command="{Binding ResetCommand}" Content="Reset" HorizontalAlignment="Left" Margin="337,71,0,0" VerticalAlignment="Top" Width="75"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="18,10,0,0" TextWrapping="Wrap" Text="Number of Columns" VerticalAlignment="Top"/>
+        <TextBox x:Name="ColumnCount" HorizontalAlignment="Left" Height="23" Margin="18,31,0,0" TextWrapping="Wrap" Text="{Binding Iterations, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="75"/>
+        <CheckBox x:Name="checkBox" Content="Test Run" HorizontalAlignment="Left" Margin="18,96,0,-20.333" VerticalAlignment="Top" IsChecked="{Binding TestRun, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock x:Name="SpeedTextBlock" HorizontalAlignment="Left" Margin="230,10,0,0" TextWrapping="Wrap" Text="Motor Speed" VerticalAlignment="Top"/>
+        <TextBox x:Name="SpeedTextBox" HorizontalAlignment="Left" Height="23" Margin="230,31,0,0" TextWrapping="Wrap" Text="{Binding MotorSpeed, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="75"/>
     </Grid>
 </UserControl>

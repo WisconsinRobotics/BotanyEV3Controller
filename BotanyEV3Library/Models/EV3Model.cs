@@ -7,7 +7,7 @@ using Lego.Ev3.Desktop;
 
 namespace BotanyEV3Library.Models
 {
-    class EV3Model
+    public class EV3Model
     {
         const byte INIT_CMD = 97; // a
         const byte TAKE_PICT_CMD = 116; // t
@@ -29,8 +29,19 @@ namespace BotanyEV3Library.Models
         int colorCounter;
         int iterations;
 
+        int motorSpeed;
+
         bool cameraSystemReady;
         bool resetting;
+        bool testRun;
+        bool initialized;
+
+        static EV3Model ev3ModelInstance = null;
+
+        public static EV3Model GetInstance()
+        {
+            return ev3ModelInstance;
+        }
 
         public EV3Model()
         {
@@ -41,45 +52,72 @@ namespace BotanyEV3Library.Models
 
             brick = new Brick(new UsbCommunication());
             brick.BrickChanged += OnBrickChanged;
-            iterations = 6;
+            iterations = 1;
+            testRun = false;
+            initialized = false;
+            motorSpeed = 10;
+            ev3ModelInstance = this;
         }
 
         public async void Initialize()
         {
             //cameraProcess = Process.Start("BotanyCameraController");
+            if (initialized)
+                return;
             await brick.ConnectAsync();
-            await brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.A, 0);
-            await brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.B, 0);
+            StopMotor();
             brick.Ports[InputPort.One].SetMode(ColorMode.Color);
 
+            initialized = true;
+
+            if (testRun)
+                return;
             cameraThread = new Thread(CameraManagerThread);
             cameraThread.Start();
         }
 
         public void Execute()
         {
-            if (!cameraSystemReady)
+            if (!initialized)
+                return;
+
+            if (!testRun && !cameraSystemReady)
                 return;
 
             colorIndex = 0;
             colorCounter = 0;
 
-            brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.A, 10);
-            brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.A, -10);
+            ForwardMotor();
         }
 
         public void Stop()
         {
-            brick.DirectCommand.StopMotorAsync(OutputPort.A, true);
+            if (!initialized)
+                return;
+            StopMotor();
+        }
+
+        public async void Reset()
+        {
+            if (!initialized)
+                return;
+            resetting = true;
+            await brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.A, -motorSpeed);
+            await brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.B, motorSpeed);
+            colorCounter = 0;
+        }
+
+        public void Shutdown()
+        {
+            if (!initialized)
+                return;
+
+            StopMotor();
+            brick.Disconnect();
             if (cameraThread != null)
                 cameraThread.Abort();
             cameraSystemReady = false;
             //cameraProcess.Kill();
-        }
-
-        public void Reset()
-        {
-
         }
 
         public void CameraManagerThread()
@@ -115,18 +153,15 @@ namespace BotanyEV3Library.Models
 
                 if (colorCounter == iterations)
                 {
-                    resetting = true;
-                    brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.A, -10);
-                    brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.B, 10);
+                    Reset();
                     return;
                 }
 
-                brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.A, 10);
-                brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.B, -10);
+                ForwardMotor();
             }
         }
 
-        async void OnBrickChanged(object sender, BrickChangedEventArgs e)
+        void OnBrickChanged(object sender, BrickChangedEventArgs e)
         {
             byte[] messagePacket = new byte[1];
 
@@ -135,20 +170,65 @@ namespace BotanyEV3Library.Models
                 if (e.Ports[InputPort.One].SIValue != resetColor)
                     return;
 
-                await brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.A, 0);
+                StopMotor();
                 resetting = false;
             }
 
             if (e.Ports[InputPort.One].SIValue != colorArray[colorIndex])
                 return;
 
-            await brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.A, 0);
+            StopMotor();
             colorIndex = colorCounter % 2;
 
+            if(testRun)
+            {
+                Thread.Sleep(2000);
+                ++colorCounter;
+                if (colorCounter == iterations)
+                {
+                    Reset();
+                    return;
+                }
+                ForwardMotor();
+                return;
+            }
             messagePacket[0] = 116; // t
             IPEndPoint sendEndpoint = new IPEndPoint(IPAddress.Loopback, 10001);
 
             udpSocket.Send(messagePacket, messagePacket.Length, sendEndpoint);
+        }
+
+        public int MotorSpeed
+        {
+            get { return motorSpeed; }
+            set {
+                if (value > 50) return;
+                motorSpeed = value;
+            }
+        }
+
+        public int Iterations
+        {
+            get { return iterations; }
+            set { iterations = value; }
+        }
+
+        public bool TestRun
+        {
+            get { return testRun; }
+            set { testRun = value; }
+        }
+
+        private async void ForwardMotor()
+        {
+            await brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.A, motorSpeed);
+            await brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.B, -motorSpeed);
+        }
+
+        private async void StopMotor()
+        {
+            await brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.A, 0);
+            await brick.DirectCommand.TurnMotorAtSpeedAsync(OutputPort.B, 0);
         }
     }
 }

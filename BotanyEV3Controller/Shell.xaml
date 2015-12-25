@@ -6,7 +6,7 @@
         xmlns:prism="http://prismlibrary.com/"
         xmlns:local="clr-namespace:BotanyEV3Controller"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Botany EV3 Controller" Height="350" Width="525">
     <Grid>
         <ContentControl prism:RegionManager.RegionName="MainRegion" />
     </Grid>
