@@ -1,6 +1,6 @@
 # BotanyEV3Controller
 The BotanyEV3Controller is a joint project with the Wisconsin Institute for
-Research for a botany outreach program to control a mobile camera platform
+Discovery for a botany outreach program to control a mobile camera platform
 recording the growth progress of newly sprouted seeds. The camera platform
 uses a Lego EV3 for mobility. This project comes in two components, this
 platform controller and a BotanyWebcamController responsible for actually
